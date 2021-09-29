@@ -19,7 +19,7 @@ module.exports = {
     use_en_variable: 'DATABASE_URL',
     dialectOptions: {
       ssl: {
-        require: true,
+        required: true,
         rejectUnauthorized: false,
       },
     },
