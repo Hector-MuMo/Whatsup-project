@@ -17,7 +17,7 @@ module.exports = {
   },
   production: {
     use_en_variable: 'DATABASE_URL',
-    dialectOptiones: {
+    dialectOptions: {
       ssl: {
         require: true,
         rejectUnauthorized: false,

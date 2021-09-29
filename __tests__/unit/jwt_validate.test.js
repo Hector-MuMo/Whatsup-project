@@ -46,7 +46,7 @@ describe('Validando la autenticación de usuarios', () => {
   it('Debería de obtener un token pasando como argumento un objeto de usuario', () => {
     //6. Crear la prueba para comprobar si genToken genera un token de verdad
 
-    let token = AuthService.genToken({});
+    let token = AuthService.genToken(userObj);
     //console.log(token);
     expect(token).toEqual(expect.any(String));
   });
