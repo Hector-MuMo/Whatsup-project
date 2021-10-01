@@ -6,8 +6,7 @@ const AuthService = require('../../src/services/auth.services');
 describe('Validando la autenticación de usuarios', () => {
   let newUser = {},
     userCreated = {},
-    userObj = {},
-    token = '';
+    userObj = {};
 
   beforeAll(async () => {
     //1. Crear un objeto de usuario con datos falsos y elegir una contraseña fija
@@ -22,19 +21,9 @@ describe('Validando la autenticación de usuarios', () => {
     //2. Insertar el usuario en la base de datos
     userCreated = await UserService.create(newUser);
 
-    //3. Iniciar sesión con el servicio login
-    let user = await AuthService.login(userCreated.email, userCreated.password);
-
+    //3. Iniciar sesión con el servicio login y
     //4. Guardar el token
-    userObj = {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      password: user.password,
-    };
-
-    token = AuthService.genToken(userObj);
-    //console.log(token);
+    let token = await AuthService.login(userCreated.email, newUser.password);
   });
 
   afterAll(async () => {
@@ -45,14 +34,26 @@ describe('Validando la autenticación de usuarios', () => {
 
   it('Debería de obtener un token pasando como argumento un objeto de usuario', () => {
     //6. Crear la prueba para comprobar si genToken genera un token de verdad
+    userCreated = JSON.parse(JSON.stringify(userCreated));
 
-    let token = AuthService.genToken(userObj);
-    //console.log(token);
+    let token = AuthService.genToken(userCreated);
+
     expect(token).toEqual(expect.any(String));
   });
 
-  it('Debería de obtener un token pasando como argumento un objeto de usuario', () => {
-    //6.1 Crear la prueba para comprobar si el token se ha creado correctamente
+  it('123Debería de obtener un token pasando un email y contraseña como argumento', async () => {
+    //6.1 Crear la prueba para comprobar si el login devuelve verdadero
+    let token = await AuthService.login(userCreated.email, newUser.password);
+
+    expect(token).toEqual(expect.any(String));
+  });
+
+  it('Debería de obtener un falso al pasar un email y contraseña inexistente', async () => {
+    //6.2 Crear la prueba para comprobar si el login devuelve verdadero
+
+    await expect(() =>
+      AuthService.login('prueba-error@gmail.com', 'error1235')
+    ).rejects.toThrow();
   });
 
   it('Debería de llamar a la función next sin argumentos con un token valido', () => {
@@ -60,7 +61,7 @@ describe('Validando la autenticación de usuarios', () => {
     const req = {
       headers: {
         authorization:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjQsImZpcnN0bmFtZSI6IkFkb2xmbyIsImxhc3RuYW1lIjoiUmFtaXJleiIsImVtYWlsIjoiYm9mbzEwMEBob3RtYWlsLmNvbSIsImlhdCI6MTYzMjg2MDc0MCwiZXhwIjoxNjMyODY3OTQwfQ._klPeoawOUa6eN-Um4roKDTDNR0nKkE24kqoA9ie0xY',
+          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjQsImZpcnN0bmFtZSI6IkFkb2xmbyIsImxhc3RuYW1lIjoiUmFtaXJleiIsImVtYWlsIjoiYm9mbzEwMEBob3RtYWlsLmNvbSIsImlhdCI6MTYzMzEwOTQ3NSwiZXhwIjoxNjMzMTE2Njc1fQ.aJHsupPFVHuGmLs_3QRKzR81MFibmnE_gHeUaNsM0XI',
       },
     };
 

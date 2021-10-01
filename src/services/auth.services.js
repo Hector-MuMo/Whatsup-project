@@ -7,20 +7,35 @@ class AuthService {
   static async login(email, password) {
     try {
       let result = await users.findOne({ where: { email } });
-      //Comparar la contraseña de la DB -> contraseña que me envía el cliente
-      const valid = bcrypt.compareSync(password, result.password);
+      let userObj = {};
 
-      result = JSON.parse(JSON.stringify(result));
+      //Comparar la contraseña de la DB -> contraseña que me envía el cliente
+      let valid = false;
+
+      if (result) {
+        userObj = {
+          id: result.id,
+          firstname: result.firstname,
+          lastname: result.lastname,
+          email: result.email,
+        };
+
+        valid = bcrypt.compareSync(password, result.password);
+
+        console.log(password);
+        console.log(result.password);
+        console.log(valid);
+        result = JSON.parse(JSON.stringify(result));
+      }
 
       if (valid) {
-        return {
-          valid: true,
-          ...result,
-        };
+        let token = this.genToken(userObj);
+        return token;
       }
-      return {
-        valid: false,
-      };
+
+      const error = new Error('Error de autenticación');
+      error.name = 'Azu makina, un error';
+      throw error;
     } catch (error) {
       throw error;
     }
